@@ -35,23 +35,22 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
 
     def execute(self, context):        # execute() is called when running the operator.
         
+        particle_systems = context.object.particle_systems
         bpm = self.bpm # beats per minute
         fps = context.scene.render.fps / context.scene.render.fps_base # frames per second
         fpm = fps * 60.0 # frames per minute
         fpb = fpm / bpm # frames per beat
-        frame_start = bpy.data.particles[bpy.context.object.particle_systems.active.settings.name].frame_start
-        emit_duration = bpy.data.particles[bpy.context.object.particle_systems.active.settings.name].frame_end - frame_start
-        original_settings = bpy.context.object.particle_systems.active.settings
+        frame_start = bpy.data.particles[particle_systems.active.settings.name].frame_start
+        emit_duration = bpy.data.particles[particle_systems.active.settings.name].frame_end - frame_start
         frame_current = frame_start + fpb
         frame_end = self.frame_end
         
 
         while frame_current <= frame_end:
-            bpy.ops.particle.duplicate_particle_system()
-            bpy.context.object.particle_systems.active_index = len(bpy.context.object.particle_systems.items()) - 1
-            bpy.context.object.particle_systems.active.settings = original_settings.copy()
-            bpy.data.particles[bpy.context.object.particle_systems.active.settings.name].frame_start = frame_current
-            bpy.data.particles[bpy.context.object.particle_systems.active.settings.name].frame_end = frame_current + emit_duration
+            bpy.ops.particle.duplicate_particle_system(use_duplicate_settings=True)
+            particle_systems.active_index = len(particle_systems.items()) - 1
+            bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
+            bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
             frame_current += fpb
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.

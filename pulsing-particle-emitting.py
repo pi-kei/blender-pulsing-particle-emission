@@ -26,7 +26,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     
     @classmethod
     def poll(self, context):
-        return context.object is not None and context.object.particle_systems.active is not None
+        return context.object is not None and context.object.particle_systems.active is not None and context.object.particle_systems.active.settings.type == 'EMITTER'
     
     def invoke(self, context, event):
         self.frame_end = context.scene.frame_end

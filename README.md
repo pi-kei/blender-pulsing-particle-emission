@@ -22,3 +22,6 @@ Creates pulsing particle emitters based on selected particle system.
 5. Set BPM (Beats Per Minute or Pulses Per Minute)
 6. Set Frame End
 7. Click OK
+
+
+![blender_0cRAVe89hR](https://user-images.githubusercontent.com/3518025/170894299-7e6fd83d-90dc-4a33-893d-10ec73932ee0.gif)

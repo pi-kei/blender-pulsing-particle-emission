@@ -6,9 +6,8 @@ bl_info = {
     "blender": (3, 1, 2), # could work in older versions but not tested
     "location": "Object > Particle Properties > Particle Specials",
     #"warning": "", # used for warning icon and text in addons panel
-    #"doc_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/"
-    #            "Scripts/My_Script",
-    #"tracker_url": "https://developer.blender.org/maniphest/task/edit/form/2/",
+    "doc_url": "https://github.com/pi-kei/blender-pulsing-particle-emitting#readme",
+    "tracker_url": "https://github.com/pi-kei/blender-pulsing-particle-emitting/issues",
     "support": "COMMUNITY",
     "category": "Object",
 }

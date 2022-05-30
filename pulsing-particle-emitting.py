@@ -48,7 +48,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
             raise ValueError("Skip Nth Beat doesn't match pattern")
         
         for part in value.split(','):
-            beat_range = part.strip().split('-', 2)
+            beat_range = part.split('-', 2)
             if len(beat_range) == 2:
                 for b in range(int(beat_range[0].strip()), int(beat_range[1].strip()) + 1):
                     skip_nth_beat.add(b)

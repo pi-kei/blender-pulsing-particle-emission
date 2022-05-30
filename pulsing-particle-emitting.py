@@ -86,8 +86,9 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                     first_beat_set = True
                 bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
                 bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
-                particle_systems.active.seed = seed_current
-                seed_current += (1 if change_seed else 0)
+                if change_seed:
+                    particle_systems.active.seed = seed_current
+                    seed_current += 1
             frame_current += fpb
             beat_current += 1
             beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1

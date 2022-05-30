@@ -23,6 +23,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     
     bpm: bpy.props.FloatProperty(name="BPM", description="Beats per minute", default=120.0, min=1.0, max=3600.0, step=100)
     frame_end: bpy.props.FloatProperty(name="Frame End", description="Final Frame to Start Emitting Particles", step=100)
+    change_seed: bpy.props.BoolProperty(name="Change Seed", description="Sets seed to a different value for every created particle system")
     
     @classmethod
     def poll(self, context):
@@ -36,12 +37,14 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     def execute(self, context):        # execute() is called when running the operator.
         
         particle_systems = context.object.particle_systems
+        change_seed = self.change_seed
         bpm = self.bpm # beats per minute
         fps = context.scene.render.fps / context.scene.render.fps_base # frames per second
         fpm = fps * 60.0 # frames per minute
         fpb = fpm / bpm # frames per beat
         frame_start = bpy.data.particles[particle_systems.active.settings.name].frame_start
         emit_duration = bpy.data.particles[particle_systems.active.settings.name].frame_end - frame_start
+        seed_current = particle_systems.active.seed + (1 if change_seed else 0)
         frame_current = frame_start + fpb
         frame_end = self.frame_end
         
@@ -51,6 +54,8 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
             particle_systems.active_index = len(particle_systems.items()) - 1
             bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
             bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
+            particle_systems.active.seed = seed_current
+            seed_current += (1 if change_seed else 0)
             frame_current += fpb
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.

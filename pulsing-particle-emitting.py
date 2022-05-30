@@ -1,6 +1,6 @@
 bl_info = {
     "name": "Pulsing particle emitting",
-    "description": "Controlls when to emit particles and when not.",
+    "description": "Helps to achieve pulsing particle emitting.",
     "author": "ComputersDontCompost",
     "version": (1, 0),
     "blender": (3, 1, 2), # could work in older versions but not tested
@@ -16,7 +16,7 @@ import bpy
 
 
 class CreatePulsingParticleEmitters(bpy.types.Operator):
-    """Creates particle systems from selected one and sets specific start ans end frames"""      # Use this as a tooltip for menu items and buttons.
+    """Creates particle systems from selected one and sets specific start frame and end frame"""      # Use this as a tooltip for menu items and buttons.
     bl_idname = "object.create_pulsing_particle_emitters"        # Unique identifier for buttons and menu items to reference.
     bl_label = "Create Pulsing Patricle Emitters"         # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.

@@ -11,7 +11,7 @@ Creates pulsing particle emitters based on selected particle system.
 5. Go to Edit -> Preferences -> Add-ons
 6. Click Install
 7. Choose .py file from previously unzipped archive and click Install Add-on
-8. Endble add-on
+8. Enable add-on
 
 ## Usage
 

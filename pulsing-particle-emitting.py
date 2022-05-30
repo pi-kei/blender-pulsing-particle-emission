@@ -28,6 +28,23 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     frame_end: bpy.props.FloatProperty(name="Frame End", description="No beats after this frame", step=100)
     change_seed: bpy.props.BoolProperty(name="Change Seed", description="Sets seed to a different value for every created particle system")
     
+    fcurve_items = []
+    fcurve_map = {}
+    
+    def get_fcurves(self, context):
+        fcurves = []
+        CreatePulsingParticleEmitters.fcurve_map = {}
+        fcurves.append(("No-fcurve", "", ""))
+        for a in bpy.data.actions:
+            for fc in a.fcurves:
+                el = "action_name=" + a.name + " data_path=" + fc.data_path + " index=" + str(fc.array_index)
+                fcurves.append((el, el, ""))
+                CreatePulsingParticleEmitters.fcurve_map[el] = fc
+        CreatePulsingParticleEmitters.fcurve_items = fcurves
+        return fcurves
+    
+    size_fcurve: bpy.props.EnumProperty(name="Size F-curve", description="F-curve to set particle size for every created particle system", items=get_fcurves)
+    
     @classmethod
     def poll(self, context):
         return context.object is not None and context.object.particle_systems.active is not None and context.object.particle_systems.active.settings.type == 'EMITTER'
@@ -57,7 +74,12 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         
         return skip_nth_beat
 
-    def execute(self, context):        # execute() is called when running the operator.
+    def execute(self, context):
+        
+        size_fcurve = None
+        
+        if self.size_fcurve and self.size_fcurve in CreatePulsingParticleEmitters.fcurve_map:
+            size_fcurve = CreatePulsingParticleEmitters.fcurve_map[self.size_fcurve]
         
         beats_per_loop = self.beats_per_loop
         skip_nth_beat = self.parse_skips()
@@ -86,6 +108,8 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                     first_beat_set = True
                 bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
                 bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
+                if size_fcurve:
+                    bpy.data.particles[particle_systems.active.settings.name].particle_size = size_fcurve.evaluate(frame_current)
                 if change_seed:
                     particle_systems.active.seed = seed_current
                     seed_current += 1
@@ -93,17 +117,18 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
             beat_current += 1
             beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1
 
-        return {'FINISHED'}            # Lets Blender know the operator finished successfully.
+        return {'FINISHED'}
 
 def menu_func(self, context):
     self.layout.operator(CreatePulsingParticleEmitters.bl_idname)
 
 def register():
     bpy.utils.register_class(CreatePulsingParticleEmitters)
-    bpy.types.PARTICLE_MT_context_menu.append(menu_func)  # Adds the new operator to an existing menu.
+    bpy.types.PARTICLE_MT_context_menu.append(menu_func)
 
 def unregister():
     bpy.utils.unregister_class(CreatePulsingParticleEmitters)
+    bpy.types.PARTICLE_MT_context_menu.remove(menu_func)
 
 
 # This allows you to run the script directly from Blender's Text editor

@@ -30,5 +30,6 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 - **Skip Nth Beat** Comma-separated list of beats to skip in a loop. Ranges are also accepted. Example: `1, 3-4`. Leave it empty if you don't need to skip beats.
 - **Frame End** No beats after this frame.
 - **Change Seed** Sets seed to a different value for every created particle system.
+- **Size F-curve** F-curve to set particle size for every created particle system. F-curve will be evaluated at a Frame Start for created particle system and this value will be used as a size. Leave it empty if you don't want this size action.
 
 ![blender_0cRAVe89hR](https://user-images.githubusercontent.com/3518025/170894299-7e6fd83d-90dc-4a33-893d-10ec73932ee0.gif)

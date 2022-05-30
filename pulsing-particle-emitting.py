@@ -13,6 +13,7 @@ bl_info = {
 }
 
 import bpy
+import re
 
 
 class CreatePulsingParticleEmitters(bpy.types.Operator):
@@ -21,8 +22,10 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     bl_label = "Create Pulsing Patricle Emitters"         # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
     
-    bpm: bpy.props.FloatProperty(name="BPM", description="Beats per minute", default=120.0, min=1.0, max=3600.0, step=100)
-    frame_end: bpy.props.FloatProperty(name="Frame End", description="Final Frame to Start Emitting Particles", step=100)
+    bpm: bpy.props.FloatProperty(name="BPM", description="Beats per Minute", default=120.0, min=1.0, max=3600.0, step=100)
+    beats_per_loop: bpy.props.IntProperty(name="Beats per Loop", description="Allows to skip beats in a loop", default=4, min=1, step=1)
+    skip_nth_beat: bpy.props.StringProperty(name="Skip Nth Beat", description="Comma-separated list of beats to skip in a loop. Example: 1,3-4")
+    frame_end: bpy.props.FloatProperty(name="Frame End", description="No beats after this frame", step=100)
     change_seed: bpy.props.BoolProperty(name="Change Seed", description="Sets seed to a different value for every created particle system")
     
     @classmethod
@@ -33,9 +36,31 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         self.frame_end = context.scene.frame_end
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
+    
+    def parse_skips(self):
+        value = self.skip_nth_beat
+        skip_nth_beat = set()
+        
+        if not value:
+            return skip_nth_beat
+        
+        if re.match('^(\s*\d+\s*(\-\s*\d+\s*)?)(,(\s*\d+\s*(\-\s*\d+\s*)?))*$', value) is None:
+            raise ValueError("Skip Nth Beat doesn't match pattern")
+        
+        for part in value.split(','):
+            beat_range = part.strip().split('-', 2)
+            if len(beat_range) == 2:
+                for b in range(int(beat_range[0].strip()), int(beat_range[1].strip()) + 1):
+                    skip_nth_beat.add(b)
+            else:
+                skip_nth_beat.add(int(beat_range[0].strip()))
+        
+        return skip_nth_beat
 
     def execute(self, context):        # execute() is called when running the operator.
         
+        beats_per_loop = self.beats_per_loop
+        skip_nth_beat = self.parse_skips()
         particle_systems = context.object.particle_systems
         change_seed = self.change_seed
         bpm = self.bpm # beats per minute
@@ -44,19 +69,28 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         fpb = fpm / bpm # frames per beat
         frame_start = bpy.data.particles[particle_systems.active.settings.name].frame_start
         emit_duration = bpy.data.particles[particle_systems.active.settings.name].frame_end - frame_start
-        seed_current = particle_systems.active.seed + (1 if change_seed else 0)
-        frame_current = frame_start + fpb
+        seed_current = particle_systems.active.seed
+        frame_current = frame_start
         frame_end = self.frame_end
+        beat_current = 1
+        beat_loop_current = 1
+        first_beat_set = False
         
 
         while frame_current <= frame_end:
-            bpy.ops.particle.duplicate_particle_system(use_duplicate_settings=True)
-            particle_systems.active_index = len(particle_systems.items()) - 1
-            bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
-            bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
-            particle_systems.active.seed = seed_current
-            seed_current += (1 if change_seed else 0)
+            if beat_loop_current not in skip_nth_beat:
+                if first_beat_set:
+                    bpy.ops.particle.duplicate_particle_system(use_duplicate_settings=True)
+                    particle_systems.active_index = len(particle_systems.items()) - 1
+                else:
+                    first_beat_set = True
+                bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
+                bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
+                particle_systems.active.seed = seed_current
+                seed_current += (1 if change_seed else 0)
             frame_current += fpb
+            beat_current += 1
+            beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1
 
         return {'FINISHED'}            # Lets Blender know the operator finished successfully.
 

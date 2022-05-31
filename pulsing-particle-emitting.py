@@ -27,6 +27,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     skip_nth_beat: bpy.props.StringProperty(name="Skip Nth Beat", description="Comma-separated list of beats to skip in a loop. Example: 1,3-4")
     frame_end: bpy.props.FloatProperty(name="Frame End", description="No beats after this frame", step=100)
     change_seed: bpy.props.BoolProperty(name="Change Seed", description="Sets seed to a different value for every created particle system")
+    custom_property_name: bpy.props.StringProperty(name="Custom Property Name", description="Name of the custom property of particle settings to be controlled by f-curve below")
     
     fcurve_items = []
     fcurve_map = {}
@@ -43,7 +44,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         CreatePulsingParticleEmitters.fcurve_items = fcurves
         return fcurves
     
-    size_fcurve: bpy.props.EnumProperty(name="Size F-curve", description="F-curve to set particle size for every created particle system", items=get_fcurves)
+    custom_property_fcurve: bpy.props.EnumProperty(name="F-curve", description="F-curve to set particle settings custom property for every created particle system", items=get_fcurves)
     
     @classmethod
     def poll(self, context):
@@ -76,10 +77,11 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
 
     def execute(self, context):
         
-        size_fcurve = None
+        custom_property_name = self.custom_property_name
+        custom_property_fcurve = None
         
-        if self.size_fcurve and self.size_fcurve in CreatePulsingParticleEmitters.fcurve_map:
-            size_fcurve = CreatePulsingParticleEmitters.fcurve_map[self.size_fcurve]
+        if self.custom_property_fcurve and self.custom_property_fcurve in CreatePulsingParticleEmitters.fcurve_map:
+            custom_property_fcurve = CreatePulsingParticleEmitters.fcurve_map[self.custom_property_fcurve]
         
         beats_per_loop = self.beats_per_loop
         skip_nth_beat = self.parse_skips()
@@ -108,8 +110,8 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                     first_beat_set = True
                 bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
                 bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
-                if size_fcurve:
-                    bpy.data.particles[particle_systems.active.settings.name].particle_size = size_fcurve.evaluate(frame_current)
+                if custom_property_name and custom_property_fcurve:
+                    bpy.data.particles[particle_systems.active.settings.name][custom_property_name] = custom_property_fcurve.evaluate(frame_current)
                 if change_seed:
                     particle_systems.active.seed = seed_current
                     seed_current += 1

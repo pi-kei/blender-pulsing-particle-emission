@@ -127,7 +127,7 @@ class RemoveParticleSystems(bpy.types.Operator):
     bl_label = "Remove Patricle Systems"         # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
     
-    pattern: bpy.props.StringProperty(name="Pattern", description="Pattern to apply on particle system's name")
+    pattern: bpy.props.StringProperty(name="Pattern", description="Pattern to apply on particle system's name. Empty matches all")
     exclude_selected: bpy.props.BoolProperty(name="Exclude Selected", description="Selected particle system will not be removed", default=True)
     is_regexp: bpy.props.BoolProperty(name="Regular Expression", description="Pattern is a regular expression or it's a name substring")
     

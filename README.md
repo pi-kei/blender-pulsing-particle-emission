@@ -3,6 +3,8 @@
 Creates pulsing particle emitters based on selected particle system whitch could be useful for music visualization.
 Blender does not have a way to turn on/off emission of the particles and this approach is kind of a workaround.
 
+[Demo Videos on YouTube](https://www.youtube.com/playlist?list=PLf8ExqLxOaiZnVnTQTR4uFbH6LwK73rZn)
+
 ## Installation
 
 1. Go to [github repository](https://github.com/pi-kei/blender-pulsing-particle-emitting)

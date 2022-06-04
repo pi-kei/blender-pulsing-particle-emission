@@ -121,15 +121,59 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class RemoveParticleSystems(bpy.types.Operator):
+    """Removes particle systems matching pattern"""      # tooltip
+    bl_idname = "object.remove_particle_systems"        # Unique identifier for buttons and menu items to reference.
+    bl_label = "Remove Patricle Systems"         # Display name in the interface.
+    bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
+    
+    pattern: bpy.props.StringProperty(name="Pattern", description="Pattern to apply on particle system's name")
+    exclude_selected: bpy.props.BoolProperty(name="Exclude Selected", description="Selected particle system will not be removed", default=True)
+    is_regexp: bpy.props.BoolProperty(name="Regular Expression", description="Pattern is a regular expression or it's a name substring")
+    
+    @classmethod
+    def poll(self, context):
+        return context.object is not None
+    
+    def invoke(self, context, event):
+        if context.object.particle_systems.active:
+            self.pattern = context.object.particle_systems.active.name
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def execute(self, context):
+        
+        pattern = self.pattern
+        exclude_selected = self.exclude_selected
+        is_regexp = self.is_regexp
+        
+        selected = context.object.particle_systems.active
+        count = len(context.object.particle_systems.items())
+        
+        for i in range(count - 1, -1, -1):
+            context.object.particle_systems.active_index = i
+            if exclude_selected and context.object.particle_systems.active == selected:
+                continue
+            if is_regexp and re.match(pattern, context.object.particle_systems.active.name) is None:
+                continue
+            if not is_regexp and pattern not in context.object.particle_systems.active.name:
+                continue
+            bpy.ops.object.particle_system_remove()
+
+        return {'FINISHED'}
+
 def menu_func(self, context):
     self.layout.operator(CreatePulsingParticleEmitters.bl_idname)
+    self.layout.operator(RemoveParticleSystems.bl_idname)
 
 def register():
     bpy.utils.register_class(CreatePulsingParticleEmitters)
+    bpy.utils.register_class(RemoveParticleSystems)
     bpy.types.PARTICLE_MT_context_menu.append(menu_func)
 
 def unregister():
     bpy.utils.unregister_class(CreatePulsingParticleEmitters)
+    bpy.utils.unregister_class(RemoveParticleSystems)
     bpy.types.PARTICLE_MT_context_menu.remove(menu_func)
 
 

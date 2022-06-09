@@ -1,6 +1,6 @@
 # Blender Addon: Pulsing Particle Emitting
 
-Creates pulsing particle emitters based on selected particle system whitch could be useful for music visualization.
+Creates pulsing particle emitters based on selected particle system which could be useful for music visualization.
 Blender does not have a way to turn on/off emission of the particles and this approach is kind of a workaround.
 
 [Demo Videos on YouTube](https://www.youtube.com/playlist?list=PLf8ExqLxOaiZnVnTQTR4uFbH6LwK73rZn)
@@ -34,6 +34,7 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 - **Change Seed** Sets seed to a different value for every created particle system.
 - **Custom Property Name** Name of the custom property of particle settings to be controlled by f-curve below. Property have to be created before. Leave it empty if you don't need custom property.
 - **F-curve** F-curve to set particle settings custom property for every created particle system. F-curve will be evaluated at a Frame Start for created particle system and this value will be used as a value of a custom property. Leave it empty if you don't want this behavior.
+- **Set Non-Custom Properties** Takes value from a custom property of particle system settings and copies it to a non-custom property with the same name. This allows you to change properties like `count` (total number of particles) per pulse which is not animatable otherwise. Doesn't do anything if Custom Property Name and F-curve omitted. To get non-custom property name quickly you can right click on the setting and select Copy Data Path.
 
 ## Additional notes about custom property and f-curve
 

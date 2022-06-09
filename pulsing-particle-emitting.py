@@ -45,6 +45,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         return fcurves
     
     custom_property_fcurve: bpy.props.EnumProperty(name="F-curve", description="F-curve to set particle settings custom property for every created particle system", items=get_fcurves)
+    set_noncustom_props: bpy.props.BoolProperty(name="Set non-custom properties", description="Takes value from a custom property of particle system settings and copies it to a non-custom property with the same name")
     
     @classmethod
     def poll(self, context):
@@ -77,15 +78,26 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
 
     def execute(self, context):
         
+        particle_systems = context.object.particle_systems
+        
         custom_property_name = self.custom_property_name
         custom_property_fcurve = None
         
         if self.custom_property_fcurve and self.custom_property_fcurve in CreatePulsingParticleEmitters.fcurve_map:
             custom_property_fcurve = CreatePulsingParticleEmitters.fcurve_map[self.custom_property_fcurve]
+            
+        set_noncustom_props = []
+        
+        if self.set_noncustom_props:
+            for cust_prop_name in particle_systems.active.settings.keys():
+                if cust_prop_name != custom_property_name and hasattr(particle_systems.active.settings, cust_prop_name):
+                    set_noncustom_props.append(cust_prop_name)
+                    
+        print("set_noncustom_props")
+        print(set_noncustom_props)
         
         beats_per_loop = self.beats_per_loop
         skip_nth_beat = self.parse_skips()
-        particle_systems = context.object.particle_systems
         change_seed = self.change_seed
         bpm = self.bpm # beats per minute
         fps = context.scene.render.fps / context.scene.render.fps_base # frames per second
@@ -108,13 +120,17 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                     particle_systems.active_index = len(particle_systems.items()) - 1
                 else:
                     first_beat_set = True
-                bpy.data.particles[particle_systems.active.settings.name].frame_start = frame_current
-                bpy.data.particles[particle_systems.active.settings.name].frame_end = frame_current + emit_duration
-                if custom_property_name and custom_property_fcurve:
-                    bpy.data.particles[particle_systems.active.settings.name][custom_property_name] = custom_property_fcurve.evaluate(frame_current)
                 if change_seed:
                     particle_systems.active.seed = seed_current
                     seed_current += 1
+                particle_systems.active.settings.frame_start = frame_current
+                particle_systems.active.settings.frame_end = frame_current + emit_duration
+                if custom_property_name and custom_property_fcurve:
+                    particle_systems.active.settings[custom_property_name] = custom_property_fcurve.evaluate(frame_current)
+                    context.scene.frame_current = int(frame_current) + 1
+                    for cust_prop_name in set_noncustom_props:
+                        print(particle_systems.active.settings[cust_prop_name])
+                        setattr(particle_systems.active.settings, cust_prop_name, particle_systems.active.settings[cust_prop_name])
             frame_current += fpb
             beat_current += 1
             beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1

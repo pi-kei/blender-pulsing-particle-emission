@@ -20,10 +20,12 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 
 1. Select object that would be particle emitter
 2. Add particle system
-3. Tweak settings keepeing on your mind that this particle system is first pulse and every new particle system would be the same except start frame and end frame
+3. Tweak settings keepeing on your mind that this particle system is first pulse and every new particle system would be the same except start frame and end frame<sup>\*</sup>
 4. With particle system being selected open Particle Specials menu and choose Create Pulsing Particle Emitters
 5. Set inputs (see description below)
 6. Click OK
+
+<sup>\*</sup> Also two custom properties `beat` and `beat_loop` with their corresponding values would be added to each particle system.
 
 ## Inputs
 

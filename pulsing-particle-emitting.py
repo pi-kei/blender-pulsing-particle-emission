@@ -125,6 +125,8 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                     seed_current += 1
                 particle_systems.active.settings.frame_start = frame_current
                 particle_systems.active.settings.frame_end = frame_current + emit_duration
+                particle_systems.active.settings["beat"] = beat_current
+                particle_systems.active.settings["beat_loop"] = beat_loop_current
                 if custom_property_name and custom_property_fcurve:
                     particle_systems.active.settings[custom_property_name] = custom_property_fcurve.evaluate(frame_current)
                     if set_noncustom_props:

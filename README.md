@@ -1,6 +1,6 @@
 # Blender Addon: Pulsing Particle Emission
 
-Creates pulsing particle emitters based on selected particle system which could be useful for music visualization.
+Creates pulsing particle emission based on selected particle system which could be useful for music visualization.
 Blender does not have a way to turn on/off emission of the particles and this approach is kind of a workaround.
 
 [Demo Videos on YouTube](https://www.youtube.com/playlist?list=PLf8ExqLxOaiZnVnTQTR4uFbH6LwK73rZn)
@@ -21,7 +21,7 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 1. Select object that would be particle emitter
 2. Add particle system
 3. Tweak settings keepeing on your mind that this particle system is first pulse and every new particle system would be the same except start frame and end frame<sup>\*</sup>
-4. With particle system being selected open Particle Specials menu and choose Create Pulsing Particle Emitters
+4. With particle system being selected open Particle Specials menu and choose Create Pulsing Particle Emission
 5. Set inputs (see description below)
 6. Click OK
 

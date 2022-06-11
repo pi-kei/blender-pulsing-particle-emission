@@ -16,10 +16,10 @@ import bpy
 import re
 
 
-class CreatePulsingParticleEmitters(bpy.types.Operator):
+class CreatePulsingParticleEmission(bpy.types.Operator):
     """Creates particle systems from selected one and sets specific start frame and end frame"""      # Use this as a tooltip for menu items and buttons.
-    bl_idname = "object.create_pulsing_particle_emitters"        # Unique identifier for buttons and menu items to reference.
-    bl_label = "Create Pulsing Patricle Emitters"         # Display name in the interface.
+    bl_idname = "object.create_pulsing_particle_emission"        # Unique identifier for buttons and menu items to reference.
+    bl_label = "Create Pulsing Patricle Emission"         # Display name in the interface.
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
     
     bpm: bpy.props.FloatProperty(name="BPM", description="Beats per Minute", default=120.0, min=1.0, max=3600.0, step=100)
@@ -35,14 +35,14 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     
     def get_fcurves(self, context):
         fcurves = []
-        CreatePulsingParticleEmitters.fcurve_map = {}
+        CreatePulsingParticleEmission.fcurve_map = {}
         fcurves.append(("No-fcurve", "", ""))
         for a in bpy.data.actions:
             for fc in a.fcurves:
                 el = "action_name=" + a.name + " data_path=" + fc.data_path + " index=" + str(fc.array_index)
                 fcurves.append((el, el, ""))
-                CreatePulsingParticleEmitters.fcurve_map[el] = fc
-        CreatePulsingParticleEmitters.fcurve_items = fcurves
+                CreatePulsingParticleEmission.fcurve_map[el] = fc
+        CreatePulsingParticleEmission.fcurve_items = fcurves
         return fcurves
     
     custom_property_fcurve: bpy.props.EnumProperty(name="F-curve", description="F-curve to set particle settings custom property for every created particle system", items=get_fcurves)
@@ -100,8 +100,8 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         custom_property_name = self.custom_property_name
         custom_property_fcurve = None
         
-        if self.custom_property_fcurve and self.custom_property_fcurve in CreatePulsingParticleEmitters.fcurve_map:
-            custom_property_fcurve = CreatePulsingParticleEmitters.fcurve_map[self.custom_property_fcurve]
+        if self.custom_property_fcurve and self.custom_property_fcurve in CreatePulsingParticleEmission.fcurve_map:
+            custom_property_fcurve = CreatePulsingParticleEmission.fcurve_map[self.custom_property_fcurve]
             
         set_noncustom_props = self.set_noncustom_props
         noncustom_props = []
@@ -203,16 +203,16 @@ class RemoveParticleSystems(bpy.types.Operator):
         return {'FINISHED'}
 
 def menu_func(self, context):
-    self.layout.operator(CreatePulsingParticleEmitters.bl_idname)
+    self.layout.operator(CreatePulsingParticleEmission.bl_idname)
     self.layout.operator(RemoveParticleSystems.bl_idname)
 
 def register():
-    bpy.utils.register_class(CreatePulsingParticleEmitters)
+    bpy.utils.register_class(CreatePulsingParticleEmission)
     bpy.utils.register_class(RemoveParticleSystems)
     bpy.types.PARTICLE_MT_context_menu.append(menu_func)
 
 def unregister():
-    bpy.utils.unregister_class(CreatePulsingParticleEmitters)
+    bpy.utils.unregister_class(CreatePulsingParticleEmission)
     bpy.utils.unregister_class(RemoveParticleSystems)
     bpy.types.PARTICLE_MT_context_menu.remove(menu_func)
 

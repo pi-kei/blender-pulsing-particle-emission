@@ -1,13 +1,13 @@
 bl_info = {
-    "name": "Pulsing particle emitting",
-    "description": "Helps to achieve pulsing particle emitting.",
+    "name": "Pulsing particle emission",
+    "description": "Helps to achieve pulsing particle emission.",
     "author": "ComputersDontCompost",
     "version": (1, 0),
     "blender": (3, 1, 2), # could work in older versions but not tested
     "location": "Object > Particle Properties > Particle Specials",
     #"warning": "", # used for warning icon and text in addons panel
-    "doc_url": "https://github.com/pi-kei/blender-pulsing-particle-emitting#readme",
-    "tracker_url": "https://github.com/pi-kei/blender-pulsing-particle-emitting/issues",
+    "doc_url": "https://github.com/pi-kei/blender-pulsing-particle-emission#readme",
+    "tracker_url": "https://github.com/pi-kei/blender-pulsing-particle-emission/issues",
     "support": "COMMUNITY",
     "category": "Object",
 }

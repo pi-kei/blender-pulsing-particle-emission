@@ -32,6 +32,7 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 - **BPM** Beats per minute or pulses per minute. First beat frame will be taken from selected particle system from Frame Start.
 - **Beats per Loop** Allows to skip beats in a loop. Ignore this if you don't need to skip beats.
 - **Skip Nth Beat** Comma-separated list of beats to skip in a loop. Ranges are also accepted. Example: `1, 3-4`. Leave it empty if you don't need to skip beats.
+- **Hide Skipped Beats** Add but hide skipped beats. Useful if you need a little manual tweaks for some beat variations.
 - **Frame End** No beats after this frame.
 - **Change Seed** Sets seed to a different value for every created particle system.
 - **Custom Property Name** Name of the custom property of particle settings to be controlled by f-curve below. Property have to be created before. Leave it empty if you don't need custom property.

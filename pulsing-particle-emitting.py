@@ -25,6 +25,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
     bpm: bpy.props.FloatProperty(name="BPM", description="Beats per Minute", default=120.0, min=1.0, max=3600.0, step=100)
     beats_per_loop: bpy.props.IntProperty(name="Beats per Loop", description="Allows to skip beats in a loop", default=4, min=1, step=1)
     skip_nth_beat: bpy.props.StringProperty(name="Skip Nth Beat", description="Comma-separated list of beats to skip in a loop. Example: 1,3-4")
+    hide_skipped: bpy.props.BoolProperty(name="Hide Skipped Beats", description="Add but hide skipped beats")
     frame_end: bpy.props.FloatProperty(name="Frame End", description="No beats after this frame", step=100)
     change_seed: bpy.props.BoolProperty(name="Change Seed", description="Sets seed to a different value for every created particle system")
     custom_property_name: bpy.props.StringProperty(name="Custom Property Name", description="Name of the custom property of particle settings to be controlled by f-curve below")
@@ -75,6 +76,22 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
                 skip_nth_beat.add(int(beat_range[0].strip()))
         
         return skip_nth_beat
+    
+    def find_particle_system_modifier(self, context, particle_system):
+        modifiers = context.object.modifiers
+        count = len(modifiers)
+        for i in range(count - 1, -1, -1):
+            m = modifiers[i]
+            if m.type == 'PARTICLE_SYSTEM' and m.particle_system == particle_system:
+                return m
+        return None
+    
+    def hide_particle_system_modifier(self, context, particle_system):
+        m = self.find_particle_system_modifier(context, particle_system)
+        if m is None:
+            return
+        m.show_render = False
+        m.show_viewport = False
 
     def execute(self, context):
         
@@ -98,6 +115,7 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         
         beats_per_loop = self.beats_per_loop
         skip_nth_beat = self.parse_skips()
+        hide_skipped = self.hide_skipped
         change_seed = self.change_seed
         bpm = self.bpm # beats per minute
         fps = context.scene.render.fps / context.scene.render.fps_base # frames per second
@@ -111,29 +129,32 @@ class CreatePulsingParticleEmitters(bpy.types.Operator):
         beat_current = 1
         beat_loop_current = 1
         first_beat_set = False
-        
 
         while frame_current <= frame_end:
-            if beat_loop_current not in skip_nth_beat:
+            to_skip = beat_loop_current in skip_nth_beat
+            if hide_skipped or not to_skip:
                 if first_beat_set:
                     bpy.ops.particle.duplicate_particle_system(use_duplicate_settings=True)
                     particle_systems.active_index = len(particle_systems.items()) - 1
                 else:
                     first_beat_set = True
+                ps_active = particle_systems.active
                 if change_seed:
-                    particle_systems.active.seed = seed_current
+                    ps_active.seed = seed_current
                     seed_current += 1
-                particle_systems.active.settings.frame_start = frame_current
-                particle_systems.active.settings.frame_end = frame_current + emit_duration
-                particle_systems.active.settings["beat"] = beat_current
-                particle_systems.active.settings["beat_loop"] = beat_loop_current
+                ps_active.settings.frame_start = frame_current
+                ps_active.settings.frame_end = frame_current + emit_duration
+                ps_active.settings["beat"] = beat_current
+                ps_active.settings["beat_loop"] = beat_loop_current
                 if custom_property_name and custom_property_fcurve:
-                    particle_systems.active.settings[custom_property_name] = custom_property_fcurve.evaluate(frame_current)
+                    ps_active.settings[custom_property_name] = custom_property_fcurve.evaluate(frame_current)
                     if set_noncustom_props:
                         # set frame to update drivers if present to use updated values while setting non-custom props
                         context.scene.frame_set(int(frame_current))
                         for prop_name in noncustom_props:
-                            setattr(particle_systems.active.settings, prop_name, particle_systems.active.settings[prop_name])
+                            setattr(ps_active.settings, prop_name, ps_active.settings[prop_name])
+                if hide_skipped and to_skip:
+                    self.hide_particle_system_modifier(context, ps_active)
             frame_current += fpb
             beat_current += 1
             beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1

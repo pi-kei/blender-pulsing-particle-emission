@@ -25,7 +25,7 @@ Blender does not have a way to turn on/off emission of the particles and this ap
 5. Set inputs (see description below)
 6. Click OK
 
-<sup>\*</sup> Also two custom properties `beat` and `beat_loop` with their corresponding values would be added to each particle system.
+<sup>\*</sup> Also two custom properties `beat`, `beat_loop` and `loop` with their corresponding values would be added to each particle system.
 
 ## Inputs
 

@@ -128,6 +128,7 @@ class CreatePulsingParticleEmission(bpy.types.Operator):
         frame_end = self.frame_end
         beat_current = 1
         beat_loop_current = 1
+        loop_current = 1
         first_beat_set = False
 
         while frame_current <= frame_end:
@@ -146,6 +147,7 @@ class CreatePulsingParticleEmission(bpy.types.Operator):
                 ps_active.settings.frame_end = frame_current + emit_duration
                 ps_active.settings["beat"] = beat_current
                 ps_active.settings["beat_loop"] = beat_loop_current
+                ps_active.settings["loop"] = loop_current
                 if custom_property_name and custom_property_fcurve:
                     ps_active.settings[custom_property_name] = custom_property_fcurve.evaluate(frame_current)
                     if set_noncustom_props:
@@ -158,6 +160,7 @@ class CreatePulsingParticleEmission(bpy.types.Operator):
             frame_current += fpb
             beat_current += 1
             beat_loop_current = ((beat_current - 1) % beats_per_loop) + 1
+            loop_current = int((beat_current - 1) / beats_per_loop) + 1
 
         return {'FINISHED'}
 
